@@ -13,7 +13,7 @@ interface PerformanceDay {
   };
 }
 
-class Nordnet {
+export class Nordnet {
   cookie: string;
 
   async renew_session() {
@@ -68,10 +68,6 @@ class Nordnet {
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
-          Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-          "Accept-Encoding": "gzip, deflate",
-          "Accept-Language": "sv-SE,sv;q=0.9,en-US;q=0.8,en;q=0.7",
           "client-id": "NEXT",
           "Content-Type": "application/json",
           Cookie: this.cookie,
@@ -111,18 +107,3 @@ class Nordnet {
     console.log(aggregated?.slice(-1)[0]);
   }
 }
-
-// read stdin username then password
-const username = process.argv[2];
-const password = process.argv[3];
-
-if (!username || !password) {
-  console.log("Usage: node main.js <username> <password>");
-  process.exit(1);
-}
-
-const nordnet = new Nordnet();
-
-nordnet.login(username, password).then(() => {
-  nordnet.performance();
-});
