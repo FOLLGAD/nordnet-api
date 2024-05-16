@@ -1,3 +1,5 @@
+import { cache } from "./cache";
+
 type BrandedType<T, Brand> = T & { readonly __brand: Brand };
 
 type AccountNumber = BrandedType<number, "AccountNumber">;
@@ -126,7 +128,10 @@ export class Nordnet {
     return account;
   }
 
+  // @ts-ignore
+  @cache(300 * 1000)
   async get_accounts() {
+    console.time("get_accounts");
     const response = await fetch("https://www.nordnet.se/api/2/accounts", {
       method: "GET",
       headers: {
@@ -138,7 +143,8 @@ export class Nordnet {
       },
     });
 
-    const accounts = (await response.json()) as AccountValue[];
+    const accounts = (await response.json()) as AccountInfo[];
+    console.timeEnd("get_accounts");
 
     return accounts;
   }
@@ -155,8 +161,12 @@ export class Nordnet {
       quarter: "m3",
     }[options.period ?? "month"];
 
+    const accounts = await this.get_accounts();
+    const accidLow = Math.min(...accounts.map((a) => a.accid));
+    const accidHigh = Math.max(...accounts.map((a) => a.accid));
+
     const response = await fetch(
-      `https://www.nordnet.se/api/2/accounts/1%2C3/returns/performance?period=${periodParam}&start_at_zero=false&resolution=DAY`,
+      `https://www.nordnet.se/api/2/accounts/${accidLow}%2C${accidHigh}/returns/performance?period=${periodParam}&start_at_zero=false&resolution=DAY`,
       {
         method: "GET",
         headers: {
