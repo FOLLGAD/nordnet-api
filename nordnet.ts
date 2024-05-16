@@ -1,3 +1,8 @@
+type BrandedType<T, Brand> = T & { readonly __brand: Brand };
+
+type AccountNumber = BrandedType<number, "AccountNumber">;
+type AccountID = BrandedType<number, "AccountID">;
+
 interface PerformanceDay {
   time: number;
   date: string;
@@ -11,6 +16,47 @@ interface PerformanceDay {
     currency: string;
     value: number;
   };
+}
+
+interface AccountValue {
+  full_marketvalue: {
+    currency: string;
+    value: number;
+  };
+  own_capital: {
+    currency: string;
+    value: number;
+  };
+  own_capital_morning: {
+    currency: string;
+    value: number;
+  };
+  account_sum: {
+    currency: string;
+    value: number;
+  };
+  accno: AccountNumber;
+  accid: AccountID;
+  equity: {
+    currency: string;
+    value: number;
+  };
+  account_code: "ISK" | "FKF" | "AF";
+  registration_date: string;
+  interest_rate: number;
+}
+
+interface AccountInfo {
+  accno: AccountNumber;
+  accid: AccountID;
+  bank_accno: string;
+  type: string;
+  atyid: number;
+  symbol: string;
+  account_code: string;
+  role: string;
+  default: boolean;
+  alias: string;
 }
 
 export class Nordnet {
@@ -60,9 +106,9 @@ export class Nordnet {
     this.cookie = this.cleanCookies(response.headers.get("set-cookie") ?? "");
   }
 
-  async get_account() {
+  async get_account(accountId: AccountID): Promise<AccountValue> {
     const response = await fetch(
-      "https://www.nordnet.se/api/2/accounts/3/positions?include_instrument_loans=true",
+      `https://www.nordnet.se/api/2/accounts/${accountId}`,
       {
         method: "GET",
         headers: {
@@ -75,17 +121,42 @@ export class Nordnet {
       }
     );
 
-    const account = await response.json();
-    console.log(account);
+    const account = (await response.json()) as AccountValue;
+
+    return account;
+  }
+
+  async get_accounts() {
+    const response = await fetch("https://www.nordnet.se/api/2/accounts", {
+      method: "GET",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
+        "client-id": "NEXT",
+        "Content-Type": "application/json",
+        Cookie: this.cookie,
+      },
+    });
+
+    const accounts = (await response.json()) as AccountValue[];
+
+    return accounts;
   }
 
   async performance(
     options: {
-      period: "month";
+      period?: "month" | "year" | "quarter";
     } & ({ aggregate: true } | { aggregate?: false; account_number: string })
   ) {
+    const periodParam = {
+      week: "w1",
+      month: "m1",
+      year: "y1",
+      quarter: "m3",
+    }[options.period ?? "month"];
+
     const response = await fetch(
-      "https://www.nordnet.se/api/2/accounts/1%2C3/returns/performance?period=m1&start_at_zero=false&resolution=DAY",
+      `https://www.nordnet.se/api/2/accounts/1%2C3/returns/performance?period=${periodParam}&start_at_zero=false&resolution=DAY`,
       {
         method: "GET",
         headers: {
@@ -97,6 +168,11 @@ export class Nordnet {
         },
       }
     );
+
+    if (!response.ok) {
+      console.log(await response.text());
+      throw new Error("Failed to get performance data");
+    }
 
     const account: {
       accid?: number;
