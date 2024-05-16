@@ -1,8 +1,9 @@
 import { Nordnet } from "./nordnet";
+import * as asciichart from "asciichart";
 
 // read stdin username then password
-const username = process.argv[2];
-const password = process.argv[3];
+const username = process.env.NN_USER
+const password = process.env.NN_PASS
 
 if (!username || !password) {
   console.log("Usage: node main.js <username> <password>");
@@ -11,6 +12,36 @@ if (!username || !password) {
 
 const nordnet = new Nordnet();
 
-nordnet.login(username, password).then(() => {
-  nordnet.performance();
+const sign = (n) => (n > 0 ? "+" : "-");
+
+nordnet.login(username, password).then(async () => {
+  const perf = await nordnet.performance({ aggregate: true, period: "month" });
+  const today = perf[perf.length - 1]!;
+  const a = asciichart.plot(
+    perf.map((p) => p.accumulated_result.value),
+    {
+      height: 20,
+      colors: [asciichart.blue],
+    }
+  );
+  console.log(a);
+  const printColorCode = (n) => {
+    if (n > 0) {
+      return "\x1b[32m";
+    } else if (n < 0) {
+      return "\x1b[31m";
+    } else {
+      return "";
+    }
+  };
+  const endCode = "\x1b[0m";
+  const boldCode = "\x1b[1m";
+
+  console.log(
+    `
+Today's performance:
+${sign(today.result.value)}${today.result.value}
+${printColorCode(today.returns)}${boldCode}${today.returns}${endCode}%
+  `.trim()
+  );
 });

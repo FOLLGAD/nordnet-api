@@ -79,7 +79,11 @@ export class Nordnet {
     console.log(account);
   }
 
-  async performance() {
+  async performance(
+    options: {
+      period: "month";
+    } & ({ aggregate: true } | { aggregate?: false; account_number: string })
+  ) {
     const response = await fetch(
       "https://www.nordnet.se/api/2/accounts/1%2C3/returns/performance?period=m1&start_at_zero=false&resolution=DAY",
       {
@@ -101,9 +105,15 @@ export class Nordnet {
       performance_ticks: PerformanceDay[];
     }[] = await response.json();
 
-    const aggregated = account?.find(
-      (a: any) => a.aggregated
+    const aggregated = account?.find((a: any) =>
+      options.aggregate
+        ? a.aggregated
+        : a.account_number === options.account_number
     )?.performance_ticks;
-    console.log(aggregated?.slice(-1)[0]);
+
+    if (!aggregated) {
+      throw new Error("No performance data found");
+    }
+    return aggregated;
   }
 }
