@@ -2,7 +2,7 @@
   "name": "nordnet-unofficial-api",
   "module": "dist/nordnet.js",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Unofficial API for Nordnet",
   "main": "dist/nordnet.js",
   "devDependencies": {
