@@ -11,5 +11,9 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FOLLGAD/nordnet-api.git",
   }
 }
