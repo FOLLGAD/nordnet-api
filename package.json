@@ -1,0 +1,15 @@
+{
+  "name": "nordnet-unofficial-api",
+  "module": "dist/nordnet.js",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Unofficial API for Nordnet",
+  "main": "dist/nordnet.js",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "asciichart": "^1.5.25"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
