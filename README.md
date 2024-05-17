@@ -2,6 +2,12 @@
 
 Unofficial Node.js API for Swedish Nordnet.
 
+## Install
+
+```bash
+$ npm install nordnet-unofficial-api
+```
+
 ## supported functionality
 
 ### Login
