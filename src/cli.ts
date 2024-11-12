@@ -56,7 +56,7 @@ nordnet.login(username, password).then(async () => {
   console.log(
     `
 Today's performance:
-${sign(today.result.value)}${today.result.value}
+${sign(today.result.value)}${Math.abs(today.result.value).toFixed(2)}
 ${printColorCode(today.returns)}${boldCode}${today.returns}${endCode}%
   `.trim()
   );

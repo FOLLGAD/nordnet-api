@@ -2,7 +2,7 @@
   "name": "nordnet-unofficial-api",
   "module": "dist/nordnet.js",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Unofficial API for Nordnet",
   "main": "dist/nordnet.js",
   "devDependencies": {
@@ -14,6 +14,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FOLLGAD/nordnet-api.git",
+    "url": "git+https://github.com/FOLLGAD/nordnet-api.git"
   }
 }
